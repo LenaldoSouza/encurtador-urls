@@ -56,4 +56,75 @@ public class UrlsServiceTests
             () => _service.CreateShortUrlAsync("ftp://arquivo-invalido.com")
         );
     }
+
+    [Fact]
+    public async Task CreateShortUrlAsync_ComUrlNula_DeveLancarArgumentException()
+    {
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => _service.CreateShortUrlAsync(null!)
+        );
+    }
+
+    [Fact]
+    public async Task CreateShortUrlAsync_ComUrlMuitoLonga_DeveLancarArgumentException()
+    {
+        // Arrange
+        var urlLonga = "https://exemplo.com/" + new string('a', 2100);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => _service.CreateShortUrlAsync(urlLonga)
+        );
+    }
+
+    [Fact]
+    public async Task GetUrlByIdAsync_ComGuidVazio_DeveLancarArgumentException()
+    {
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => _service.GetUrlByIdAsync(Guid.Empty)
+        );
+    }
+
+    [Fact]
+    public async Task GetUrlByIdAsync_ComIdInexistente_DeveRetornarNull()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _mockContext.Setup(c => c.GetByIdAsync(id))
+            .ReturnsAsync((UrlItem?)null);
+
+        // Act
+        var resultado = await _service.GetUrlByIdAsync(id);
+
+        // Assert
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public async Task GetUrlByIdAsync_ComIdExistente_DeveRetornarUrlItemCorreto()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var urlItem = new UrlItem
+        {
+            Id = id,
+            OriginalUrl = "https://www.google.com",
+            ShortCode = "abc123",
+            CreatedAt = DateTimeOffset.UtcNow,
+            ClickCount = 0
+        };
+        _mockContext.Setup(c => c.GetByIdAsync(id))
+            .ReturnsAsync(urlItem);
+
+        // Act
+        var resultado = await _service.GetUrlByIdAsync(id);
+
+        // Assert
+        Assert.NotNull(resultado);
+        Assert.Equal(id, resultado!.Id);
+        Assert.Equal(urlItem.OriginalUrl, resultado.OriginalUrl);
+        Assert.Equal(urlItem.ShortCode, resultado.ShortCode);
+    }
 }

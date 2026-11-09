@@ -33,4 +33,18 @@ public class UrlsService : IUrlsService
     {
         throw new NotImplementedException();
     }
+
+    public interface IUrlsService
+    {
+        Task<UrlItem> CreateShortUrlAsync(string originalUrl);
+        Task<UrlItem?> GetUrlByIdAsync(Guid id);
+    }
+
+    /// <remarks>
+    /// IMPLEMENTAÇÃO PENDENTE (fase RED do TDD).
+    /// </remarks>
+    public Task<UrlItem?> GetUrlByIdAsync(Guid id)
+    {
+        throw new NotImplementedException();
+    }
 }
