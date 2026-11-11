@@ -110,8 +110,11 @@ public class UrlsService : IUrlsService
     /// <remarks>
     /// IMPLEMENTAÇÃO PENDENTE (fase RED do TDD).
     /// </remarks>
-    public Task<UrlItem?> GetUrlByIdAsync(Guid id)
+    public async Task<UrlItem?> GetUrlByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        if (id == Guid.Empty)
+            throw new ArgumentException("ID não pode ser vazio.", nameof(id));
+
+        return await _context.GetByIdAsync(id);
     }
 }
